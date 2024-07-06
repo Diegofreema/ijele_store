@@ -1,18 +1,22 @@
 'use client';
 
-import { addToCart, removeFromCart } from '@/db/mutations';
+import {
+  addToCart,
+  decreaseProductInCart,
+  increaseProductInCart,
+} from '@/db/mutations';
 import { useToast } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-export const useCart = (productId: number, qty?: number) => {
+export const useIncrease = (productId: number) => {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const router = useRouter();
-  const handleAddToCart = async () => {
+  const handleIncrease = async () => {
     setIsLoading(true);
     try {
-      const { message } = await addToCart({ productId, qty });
+      const { message } = await increaseProductInCart(productId);
       if (message === 'Please login') {
         toast({
           title: 'Please login',
@@ -21,21 +25,22 @@ export const useCart = (productId: number, qty?: number) => {
           isClosable: true,
           duration: 5000,
         });
+        router.push('/sign-in');
       }
-      if (message === 'Error updating cart') {
+      if (message === 'failed') {
         toast({
           title: 'Error',
-          description: 'Error updating cart',
+          description: 'Error updating quantity',
           status: 'error',
           position: 'top-right',
           isClosable: true,
           duration: 5000,
         });
       }
-      if (message === 'Cart updated') {
+      if (message === 'success') {
         toast({
           title: 'Success',
-          description: 'Cart updated successfully',
+          description: 'quantity updated successfully',
           status: 'success',
           position: 'top-right',
           isClosable: true,
@@ -46,7 +51,7 @@ export const useCart = (productId: number, qty?: number) => {
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'Error updating cart',
+        description: 'Error updating quantity',
         status: 'error',
         position: 'top-right',
         isClosable: true,
@@ -57,17 +62,17 @@ export const useCart = (productId: number, qty?: number) => {
     }
   };
 
-  return { isLoading, handleAddToCart };
+  return { isLoading, handleIncrease };
 };
 
-export const useRemoveCart = (productId: number) => {
-  const [isRemoving, setIsRemoving] = useState(false);
+export const useDecrease = (productId: number) => {
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const router = useRouter();
-  const handleRemoveFromCart = async () => {
-    setIsRemoving(true);
+  const handleDecrease = async () => {
+    setIsLoading(true);
     try {
-      const { message } = await removeFromCart(productId);
+      const { message } = await decreaseProductInCart(productId);
       if (message === 'Please login') {
         toast({
           title: 'Please login',
@@ -76,21 +81,22 @@ export const useRemoveCart = (productId: number) => {
           isClosable: true,
           duration: 5000,
         });
+        router.push('/sign-in');
       }
-      if (message === 'Error updating cart') {
+      if (message === 'failed') {
         toast({
           title: 'Error',
-          description: 'Error updating cart',
+          description: 'Error updating quantity',
           status: 'error',
           position: 'top-right',
           isClosable: true,
           duration: 5000,
         });
       }
-      if (message === 'Cart updated') {
+      if (message === 'success') {
         toast({
           title: 'Success',
-          description: 'Cart updated successfully',
+          description: 'quantity updated successfully',
           status: 'success',
           position: 'top-right',
           isClosable: true,
@@ -101,16 +107,16 @@ export const useRemoveCart = (productId: number) => {
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'Error updating cart',
+        description: 'Error updating quantity',
         status: 'error',
         position: 'top-right',
         isClosable: true,
         duration: 5000,
       });
     } finally {
-      setIsRemoving(false);
+      setIsLoading(false);
     }
   };
 
-  return { isRemoving, handleRemoveFromCart };
+  return { isLoading, handleDecrease };
 };

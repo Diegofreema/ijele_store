@@ -1,11 +1,12 @@
 'use client';
-import { forgotPasswordFn } from '@/actions/auth.action';
+
 import { AuthHeader } from '@/components/AuthHeader';
-import { CustomButton } from '@/components/form/CustomButton';
-import { CustomInput } from '@/components/form/CustomInput';
-import { ValidateInput } from '@/components/form/ValidateInput';
-import { CustomText } from '@/components/ui/typography';
-import { forgotPassword, loginSchema } from '@/utils/validator';
+import { CustomButton } from '@/components/CustomButton';
+
+import { CustomText } from '@/components/typography';
+import { ValidateInput } from '@/components/ValidateInput';
+import { forgotPasswordFn } from '@/db/mutations';
+import { forgotPassword, loginSchema } from '@/validators';
 import { Box, Flex, useToast } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'next-view-transitions';
@@ -95,7 +96,7 @@ export const ForgotPassword = ({}: Props): JSX.Element => {
           />
 
           <CustomButton
-            text="Submit"
+            title="Submit"
             onClick={handleSubmit(onSubmit)}
             isLoading={isSubmitting}
             loadingText="Submitting..."

@@ -1,5 +1,6 @@
 'use client';
-import { verifyEmail } from '@/actions/auth.action';
+
+import { verifyEmail } from '@/db/mutations';
 import { Flex, Spinner, useToast } from '@chakra-ui/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';

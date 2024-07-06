@@ -88,7 +88,6 @@ export const usersTable = pgTable('users', {
   phoneNumber: text('phoneNumber'),
   password: text('password').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const imagesTable = pgTable('images', {
@@ -219,7 +218,7 @@ export const videoTable = pgTable('videos', {
 });
 
 export const cartTable = pgTable('cart', {
-  id: bigint('id', { mode: 'number' }).primaryKey().unique(),
+  id: serial('id').primaryKey().unique(),
   userId: uuid('userId').references(() => usersTable.user_id, {
     onDelete: 'cascade',
   }),
@@ -227,7 +226,7 @@ export const cartTable = pgTable('cart', {
     () => productTable.id,
     { onDelete: 'cascade' }
   ),
-  quantity: bigint('id', { mode: 'number' }).default(0),
+  quantity: numeric('quantity').default('1'),
 });
 export const favoriteTable = pgTable('favorite', {
   id: bigint('id', { mode: 'number' }).primaryKey().unique(),

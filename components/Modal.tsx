@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { ProfileDrawer } from './drawers/ProfileDrawer';
-import { CartDrawer } from './drawers/CartDrawer';
 import { Favorite } from './drawers/Favourite';
 
 type Props = {};
@@ -18,7 +17,7 @@ export const Modals = () => {
   return (
     <>
       <ProfileDrawer />
-      <CartDrawer />
+
       <Favorite />
     </>
   );

@@ -16,13 +16,14 @@ import { X } from 'lucide-react';
 import { ChangeEventHandler, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { registerSchema } from '../../../../../validators';
+import { registerSchema } from '@/validators';
 import { MyText } from '@/components/MyText';
 import { CustomButton } from '@/components/CustomButton';
 import { AuthHeader } from '@/components/AuthHeader';
-import { ValidateInput } from '@/components/ValidateInput';
+
 import { register } from '@/db/mutations';
-import { createClient } from '@/util/supabase/client';
+import { createClient } from '@/utils/supabase/client';
+import { ValidateInput } from '@/components/ValidateInput';
 type Props = {};
 
 export const RegisterForm = ({}: Props): JSX.Element => {

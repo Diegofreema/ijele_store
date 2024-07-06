@@ -7,13 +7,14 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { loginSchema } from '../../../../../validators';
+import { loginSchema } from '@/validators';
 import { login } from '@/db/mutations';
 import { AuthHeader } from '@/components/AuthHeader';
-import { ValidateInput } from '@/components/ValidateInput';
+
 import { CustomButton } from '@/components/CustomButton';
-import { colors } from '../../../../../constants';
+import { colors } from '@/constants';
 import { CustomText } from '@/components/typography';
+import { ValidateInput } from '@/components/ValidateInput';
 type Props = {};
 
 export const LoginForm = ({}: Props): JSX.Element => {
@@ -42,6 +43,7 @@ export const LoginForm = ({}: Props): JSX.Element => {
     console.log(data);
     try {
       const res = await login(data.email, data.password);
+      console.log(res);
 
       if (res?.message === 'User not found') {
         return toast({
@@ -55,6 +57,14 @@ export const LoginForm = ({}: Props): JSX.Element => {
         return toast({
           title: 'Error: Invalid credentials',
           description: 'Please use a different username or password',
+          status: 'error',
+          position: 'top-right',
+        });
+      }
+      if (res?.message === 'Failed to login') {
+        return toast({
+          title: 'Error',
+          description: 'Please try again later, failed to login',
           status: 'error',
           position: 'top-right',
         });
@@ -122,7 +132,8 @@ export const LoginForm = ({}: Props): JSX.Element => {
           <CustomButton
             title="Login"
             onClick={handleSubmit(onSubmit)}
-            isLoading={isSubmitting}
+            loading={isSubmitting}
+            loadingText="Signing in..."
             bg={colors.darkBlue}
           />
           <Link href="/forgot-password">

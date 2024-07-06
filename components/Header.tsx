@@ -15,6 +15,7 @@ import {
   useColorMode,
   useColorModeValue,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import { Link } from 'next-view-transitions';
 import {
@@ -28,12 +29,20 @@ import {
 } from 'lucide-react';
 
 import { motion } from 'framer-motion';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { colors } from '@/constants';
 import { MobileDrawer } from './MobileNav';
 import { MyText } from './MyText';
+import { useCartOpen } from '@/lib/zustand/useCartOpen';
+import { useFavOpen } from '@/lib/zustand/useFavOpen';
+import { useProfileOpen } from '@/lib/zustand/useProfileOpen';
+import { cookies } from 'next/headers';
+import { getId } from '@/db/queries';
+import { useEffect, useState } from 'react';
 
-interface Props {}
+interface Props {
+  id: string | undefined;
+}
 export const links = [
   {
     href: '/men',
@@ -48,7 +57,7 @@ export const links = [
     label: 'Kids',
   },
 ];
-export const Header = ({}: Props) => {
+export const Header = ({ id }: Props) => {
   const bg = useColorModeValue(colors.darkBlue, '#181818');
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -89,7 +98,7 @@ export const Header = ({}: Props) => {
           </Link>
           <Links />
         </Flex>
-        <OtherLinks />
+        <OtherLinks id={id} />
         <ToggleDarkMode />
         <MobileDrawer isOpen={isOpen} onClose={onClose} />
         <IconButton
@@ -158,7 +167,7 @@ export const ToggleDarkMode = () => {
   );
 };
 
-const OtherLinks = () => {
+const OtherLinks = ({ id }: { id: string | undefined }) => {
   return (
     <Flex
       justifyContent={'space-between'}
@@ -173,25 +182,65 @@ const OtherLinks = () => {
         <Input placeholder="Search here..." />
       </InputGroup>
 
-      <IconGroup />
+      <IconGroup id={id} />
     </Flex>
   );
 };
 
-const IconGroup = () => {
+const IconGroup = ({ id }: { id: string | undefined }) => {
+  const { onOpen } = useCartOpen();
+  const { onOpen: onOpenFav } = useFavOpen();
+  const { onOpen: onOpenProfile } = useProfileOpen();
+  const toast = useToast();
+  const router = useRouter();
+  const handleClick = (type: 'cart' | 'fav' | 'profile') => {
+    if (!id) {
+      router.push('/sign-in');
+      toast({
+        title: 'Please login to continue',
+        status: 'info',
+        position: 'top-right',
+        duration: 5000,
+      });
+      return;
+    }
+    if (type === 'cart') {
+      onOpen();
+    }
+
+    if (type === 'profile') {
+      onOpenProfile();
+    }
+
+    if (type === 'fav') {
+      onOpenFav();
+    }
+  };
   return (
     <Flex alignItems={'center'} gap={5}>
       <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
-        <IconButton aria-label="icon" icon={<User />} />
-        <MyText text="Profile" mt={2} />
+        <IconButton
+          aria-label="icon"
+          icon={<User />}
+          onClick={() => handleClick('profile')}
+        />
+        <MyText text="Profile" mt={2} textColor="white" />
       </Box>
+      {/* <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
+        <IconButton
+          aria-label="icon"
+          icon={<Heart />}
+          onClick={() => handleClick('fav')}
+        />
+        <MyText text="Favorite" mt={2} textColor="white" />
+      </Box> */}
       <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
-        <IconButton aria-label="icon" icon={<Heart />} />
-        <MyText text="Favorite" mt={2} />
-      </Box>
-      <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
-        <IconButton aria-label="icon" icon={<ShoppingCart />} />
-        <MyText text="Cart" mt={2} />
+        <IconButton
+          aria-label="icon"
+          icon={<ShoppingCart />}
+          onClick={() => handleClick('cart')}
+        />
+        <MyText text="Cart" mt={2} textColor="white" />
       </Box>
     </Flex>
   );

@@ -1,5 +1,5 @@
 import { Details } from './_component/Details';
-import { getSingleProduct } from '@/db/queries';
+import { getSimilarProduct, getSingleProduct } from '@/db/queries';
 import { notFound } from 'next/navigation';
 
 const page = async ({ searchParams }: { searchParams: { id: string } }) => {
@@ -7,7 +7,8 @@ const page = async ({ searchParams }: { searchParams: { id: string } }) => {
     return notFound();
   }
   const product = await getSingleProduct(+searchParams.id);
-  return <Details product={product} />;
+  const similarProduct = await getSimilarProduct(product.category);
+  return <Details product={product} similarProduct={similarProduct} />;
 };
 
 export default page;

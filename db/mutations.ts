@@ -1,11 +1,10 @@
 'use server';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, ilike, sql } from 'drizzle-orm';
 import { db } from '.';
 import {
   cartTable,
   favoriteTable,
   InsertUser,
-  productTable,
   SelectUser,
   usersTable,
 } from './schema';
@@ -19,36 +18,55 @@ import ResetPassword from '@/email/ResetPassword';
 
 const resend = new Resend(process.env.RESEND_KEY);
 const api = process.env.BASE_URL;
-export const addToCart = async (productId: number) => {
+
+type CartType = {
+  productId: number;
+  qty?: number;
+};
+export const addToCart = async ({ productId, qty = 1 }: CartType) => {
   const userId = cookies().get('id')?.value;
   if (!userId) {
     redirect('/sign-in');
     return { message: 'Please login' };
   }
   try {
-    const isInCart = await db
-      .select()
-      .from(cartTable)
+    const productAddedToCArt = await db
+      .insert(cartTable)
+      .values({
+        productId: productId,
+        userId: userId,
+        quantity: qty.toString(),
+      })
+      .returning();
+    if (productAddedToCArt.length > 0) {
+      revalidatePath('/', 'layout');
+      return { message: 'Cart updated' };
+    }
+    return { message: 'Error updating cart' };
+  } catch (error) {
+    console.log(error);
+    return { message: 'Error updating cart' };
+  }
+};
+export const removeFromCart = async (productId: number) => {
+  const userId = cookies().get('id')?.value;
+  if (!userId) {
+    redirect('/sign-in');
+    return { message: 'Please login' };
+  }
+  try {
+    const deletedProductInCart = await db
+      .delete(cartTable)
       .where(
         and(eq(cartTable.userId, userId), eq(cartTable.productId, productId))
-      );
+      )
+      .returning();
 
-    if (isInCart.length > 0) {
-      await db
-        .delete(cartTable)
-        .where(
-          and(eq(cartTable.userId, userId), eq(cartTable.productId, productId))
-        );
+    if (deletedProductInCart.length > 0) {
+      revalidatePath('/', 'layout');
+      return { message: 'Cart updated' };
     }
-
-    if (!isInCart) {
-      await db
-        .insert(cartTable) // @ts-ignore
-        .values({ productId: productId, userId: userId });
-    }
-
-    revalidatePath('/');
-    return { message: 'Cart updated' };
+    return { message: 'Error updating cart' };
   } catch (error) {
     console.log(error);
     return { message: 'Error updating cart' };
@@ -130,11 +148,12 @@ export const register = async (values: InsertUser) => {
 
 export const login = async (email: string, password: string) => {
   try {
-    const userData = await db
-      .select()
-      .from(usersTable)
-      .where(eq(usersTable.email, email));
-    const user = userData?.[0];
+    const user = await db.query.usersTable.findFirst({
+      where: (table) => ilike(table.email, email),
+    });
+
+    console.log(user);
+
     if (!user) {
       return { message: 'User not found' };
     }
@@ -150,6 +169,8 @@ export const login = async (email: string, password: string) => {
     cookies().set('id', user.user_id);
     return { message: 'success' };
   } catch (error) {
+    console.log('', error);
+
     return { message: 'Failed to login' };
   }
 };
@@ -235,10 +256,11 @@ const checkIfInCart = async (userId: string, productId: number) => {
   return null;
 };
 
-export const increaseProductInCart = async (
-  userId: string,
-  productId: number
-) => {
+export const increaseProductInCart = async (productId: number) => {
+  const userId = cookies().get('id')?.value;
+  if (!userId) {
+    return { message: 'Please login' };
+  }
   try {
     const productInCart = await checkIfInCart(userId, productId);
     if (productInCart) {
@@ -249,22 +271,23 @@ export const increaseProductInCart = async (
           and(eq(cartTable?.userId, userId), eq(cartTable.productId, productId))
         );
     } else {
-      await addToCart(productId);
+      await addToCart({ productId });
     }
-
+    revalidatePath('/', 'layout');
     return { message: 'success' };
   } catch (error) {
     return { message: 'failed' };
   }
 };
-export const decreaseProductInCart = async (
-  userId: string,
-  productId: number
-) => {
+export const decreaseProductInCart = async (productId: number) => {
+  const userId = cookies().get('id')?.value;
+  if (!userId) {
+    return { message: 'Please login' };
+  }
   try {
     const productInCart = await checkIfInCart(userId, productId);
     if (productInCart) {
-      if (productInCart?.quantity! > 1) {
+      if (+productInCart?.quantity! > 1) {
         await db
           .update(cartTable)
           .set({ quantity: sql`${cartTable.quantity} - 1` })
@@ -276,12 +299,13 @@ export const decreaseProductInCart = async (
           );
       }
     }
-    if (!productInCart) {
-      await addToCart(productId);
-    }
-
+    revalidatePath('/', 'layout');
     return { message: 'success' };
   } catch (error) {
     return { message: 'failed' };
   }
+};
+
+export const resetPasswordFn = async (userId: string, password: string) => {
+  return { message: '' };
 };

@@ -16,10 +16,12 @@ import { Link } from 'next-view-transitions';
 import { formatText } from '@/lib/helper';
 import { CustomButton } from './CustomButton';
 
-import { Heart } from 'lucide-react';
-import { useCart } from '@/hooks/useCart';
+import { Heart, ShoppingCart } from 'lucide-react';
+import { useCart, useRemoveCart } from '@/hooks/useCart';
 import { useFav } from '@/hooks/useFav';
 import { colors } from '@/constants';
+import { useIsInCart } from '@/hooks/useGetCart';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   title: string;
@@ -49,7 +51,7 @@ export const ProductDisplay = ({ title, products }: Props): JSX.Element => {
           </Link>
         )}
       </Flex>
-      <SimpleGrid columns={{ base: 1, md: 4 }} gap={5}>
+      <SimpleGrid columns={{ base: 1, md: 3 }} gap={5}>
         {products?.length &&
           products.map((product) => (
             <ProductCard key={product.id} {...product} />
@@ -77,8 +79,21 @@ const ProductCard = ({
   description,
 }: SelectProduct) => {
   const { handleAddToCart, isLoading } = useCart(id);
-  const { handleFav, loading } = useFav(id);
+  const { handleRemoveFromCart, isRemoving } = useRemoveCart(id);
+  const { inCart, loading, fn } = useIsInCart(id);
+  const router = useRouter();
 
+  const btnText = inCart ? 'Remove' : 'Add';
+  const onLoading = isLoading || loading || isRemoving;
+  const handleClick = () => {
+    if (inCart) {
+      handleRemoveFromCart();
+      fn();
+    } else {
+      handleAddToCart();
+      fn();
+    }
+  };
   return (
     <Card minHeight={400} overflow="hidden">
       <Link href={`/product?id=${id}`} passHref>
@@ -100,26 +115,23 @@ const ProductCard = ({
             </Text>
           </Flex>
 
-          <Text fontWeight={'bold'} fontSize={'md'} mt={10} textColor={'black'}>
+          <Text fontWeight={'bold'} fontSize={'md'} mt={5} textColor={'black'}>
             {formatText(description)}
           </Text>
         </CardBody>
       </Link>
       <CardFooter bg="white" justifyContent={'space-between'}>
         <CustomButton
-          isLoading={isLoading}
-          isDisabled={isLoading}
-          title="Add to cart"
-          onClick={handleAddToCart}
-          bg={colors.darkBlue}
-        />
-        <IconButton
-          onClick={handleFav}
-          isLoading={loading}
-          isDisabled={loading}
-          bg={colors.brown}
-          aria-label="icon"
-          icon={<Heart />}
+          leftIcon={<ShoppingCart color="black" />}
+          isLoading={onLoading}
+          isDisabled={onLoading}
+          title={btnText}
+          color="black"
+          onClick={handleClick}
+          bg={'transparent'}
+          borderRadius={20}
+          borderWidth={1}
+          borderColor={'black'}
         />
       </CardFooter>
     </Card>

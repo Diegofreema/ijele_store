@@ -2,11 +2,13 @@
 
 import { addToFav } from '@/db/mutations';
 import { useToast } from '@chakra-ui/react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export const useFav = (productId: number) => {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
+  const router = useRouter();
   const handleFav = async () => {
     setLoading(true);
     try {
@@ -39,6 +41,7 @@ export const useFav = (productId: number) => {
           isClosable: true,
           duration: 5000,
         });
+        router.refresh();
       }
     } catch (error) {
       toast({

@@ -1,9 +1,10 @@
 'use client';
-import { resetPasswordFn } from '@/actions/auth.action';
+
 import { AuthHeader } from '@/components/AuthHeader';
-import { CustomButton } from '@/components/form/CustomButton';
-import { ValidateInput } from '@/components/form/ValidateInput';
-import { resetPassword } from '@/utils/validator';
+import { CustomButton } from '@/components/CustomButton';
+import { ValidateInput } from '@/components/ValidateInput';
+import { resetPasswordFn } from '@/db/mutations';
+import { resetPassword } from '@/validators';
 import { Box, Flex, useToast } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { notFound, useRouter, useSearchParams } from 'next/navigation';
@@ -99,7 +100,7 @@ export const ResetPassword = ({}: Props): JSX.Element => {
           />
 
           <CustomButton
-            text="Reset Password"
+            title="Reset Password"
             onClick={handleSubmit(onSubmit)}
             isLoading={isSubmitting}
           />

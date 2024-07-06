@@ -1,8 +1,11 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
+import { and, count, eq, getTableColumns } from 'drizzle-orm';
 import { db } from '.';
-import { SelectProduct, productTable } from './schema';
+import { SelectCart, SelectProduct, cartTable, productTable } from './schema';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { ProductInCartType } from '@/hooks/useGetCart';
 
 export const getMenProducts = async (): Promise<Array<SelectProduct>> => {
   try {
@@ -51,4 +54,56 @@ export const getSingleProduct = async (id: number): Promise<SelectProduct> => {
   } catch (error) {
     throw new Error('Failed to get product');
   }
+};
+export const getSimilarProduct = async (
+  cat: string
+): Promise<Array<SelectProduct>> => {
+  try {
+    const similarProducts = await db
+      .select()
+      .from(productTable)
+      .where(eq(productTable.category, cat));
+    return similarProducts;
+  } catch (error) {
+    console.log(error);
+
+    throw new Error('Failed to get product');
+  }
+};
+
+export const getProductInCart = async (): Promise<Array<ProductInCartType>> => {
+  const id = cookies().get('id')?.value;
+  if (!id) {
+    return [];
+  }
+
+  try {
+    const products = await db
+      .select()
+      .from(cartTable)
+      .where(eq(cartTable.userId, id))
+      .leftJoin(productTable, eq(cartTable.productId, productTable.id));
+    return products;
+  } catch (error) {
+    console.log('error', error);
+    throw new Error('Failed to get product in cart');
+  }
+};
+export const getId = () => {
+  const id = cookies().get('id')?.value;
+  if (!id) return undefined;
+  return id;
+};
+export const checkIfAddedInCart = async (
+  productId: number
+): Promise<boolean> => {
+  const id = cookies().get('id')?.value;
+  if (!id) {
+    return false;
+  }
+  const isInCart = await db.query.cartTable.findFirst({
+    where: and(eq(cartTable.userId, id), eq(cartTable.productId, productId)),
+  });
+  if (isInCart) return true;
+  return false;
 };

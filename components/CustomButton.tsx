@@ -4,6 +4,7 @@ type Props = ButtonProps & {
   onClick: () => void;
   title: string;
   loading?: boolean;
+  color?: string;
 };
 
 export const CustomButton = ({
@@ -12,6 +13,7 @@ export const CustomButton = ({
   loading,
   bg = 'black',
   borderRadius = 5,
+  color = 'white',
   ...props
 }: Props): JSX.Element => {
   return (
@@ -20,7 +22,7 @@ export const CustomButton = ({
       onClick={onClick}
       isLoading={loading}
       bg={bg}
-      color="white"
+      color={color}
       borderRadius={borderRadius}
       _hover={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
     >
