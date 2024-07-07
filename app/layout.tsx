@@ -40,7 +40,7 @@ export default function RootLayout({
             <Modals />
             <Drawer />
             <Profile />
-            {children}
+            <div className="min-h-screen">{children}</div>
             <Footer />
           </Providers>
         </body>

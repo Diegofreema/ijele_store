@@ -117,7 +117,7 @@ export const checkIfAddedInCart = async (
   return false;
 };
 
-export const getProfile = async (id: string): Promise<SelectUser> => {
+export const getProfile = async (id: string): Promise<SelectUser | null> => {
   try {
     const user = await db.query.usersTable.findFirst({
       where: eq(usersTable.user_id, id),
@@ -127,7 +127,8 @@ export const getProfile = async (id: string): Promise<SelectUser> => {
     }
     return user;
   } catch (error) {
-    throw new Error('Failed to get profile');
+    console.log('error', error);
+    return null;
   }
 };
 

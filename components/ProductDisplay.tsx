@@ -52,7 +52,7 @@ export const ProductDisplay = ({ title, products }: Props): JSX.Element => {
         )}
       </Flex>
       <SimpleGrid columns={{ base: 1, md: 3 }} gap={5}>
-        {products?.length &&
+        {products?.length > 0 &&
           products.map((product) => (
             <ProductCard key={product.id} {...product} />
           ))}

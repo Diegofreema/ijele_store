@@ -1,11 +1,8 @@
 import { Wrapper } from '@/components/Wrapper';
 import { Landing } from './_component/Landing';
-
 import { getKidsProduct, getMenProducts, getWomenProducts } from '@/db/queries';
 import { Sponsor } from '@/components/Sponsors';
 import { ProductDisplay } from '@/components/ProductDisplay';
-
-interface Props {}
 
 const page = async () => {
   const menData = getMenProducts();

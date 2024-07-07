@@ -20,7 +20,7 @@ export const Favorite = ({ orders }: Props): JSX.Element => {
   const { isOpen, onClose } = useFavOpen();
 
   return (
-    <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+    <Drawer isOpen={isOpen} placement="right" onClose={onClose} size={'lg'}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />

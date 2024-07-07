@@ -16,14 +16,14 @@ import { CustomText } from '../typography';
 import { useRouter } from 'next/navigation';
 import { colors } from '../../constants';
 type Props = {
-  user: SelectUser;
+  user: SelectUser | null;
 };
 
 export const ProfileDrawer = ({ user }: Props): JSX.Element => {
   const { isOpen, onClose } = useProfileOpen();
   const router = useRouter();
   const handleEdit = () => {
-    router.push(`/${user.user_id}`);
+    router.push(`/${user?.user_id}`);
     onClose();
   };
   return (

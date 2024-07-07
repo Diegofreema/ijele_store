@@ -1,6 +1,7 @@
 'use client';
 import { ProductInCartType } from '@/hooks/useGetCart';
 import { useCartOpen } from '@/lib/zustand/useCartOpen';
+import { PaystackConsumer } from 'react-paystack';
 import {
   Drawer,
   DrawerBody,
@@ -17,17 +18,59 @@ import {
   Flex,
   Spinner,
   Heading,
+  useToast,
 } from '@chakra-ui/react';
 import { CustomText } from '../typography';
 import { Minus, Plus } from 'lucide-react';
 import { colors } from '@/constants';
 import { useDecrease, useIncrease } from '@/hooks/useControl';
+import { Suspense, useCallback, useReducer } from 'react';
+import { SelectUser } from '@/db/schema';
 type Props = {
   cartItems: ProductInCartType[];
+  user: SelectUser | null;
 };
 
-export const Cart = ({ cartItems }: Props): JSX.Element => {
+export const Cart = ({ cartItems, user }: Props): JSX.Element => {
   const { isOpen, onClose } = useCartOpen();
+  const toast = useToast();
+  const totalPrice = cartItems.reduce((accumulator, item) => {
+    return (
+      accumulator + Number(item?.cart?.quantity) * Number(item?.products?.price)
+    );
+  }, 0);
+  const onSuccess = useCallback(async () => {
+    toast({
+      title: 'Processing',
+      description: `Please be patient...`,
+      status: 'loading',
+      position: 'top-right',
+    });
+    // const { message } = await onSub(user.user_id, singleMember?.type as any);
+  }, [toast]);
+
+  const onCloseFn = useCallback(() => {
+    toast({
+      title: 'Oops!',
+      description: `You cancelled the transaction`,
+      status: 'info',
+      position: 'top-right',
+    });
+  }, [toast]);
+
+  const config = {
+    reference: new Date().getTime().toString(),
+    email: user?.email!,
+    amount: totalPrice! * 100,
+    publicKey: 'pk_test_52f4b5b31fa901229f5d3e2a1641d7477aacf092',
+  };
+
+  const componentProps = {
+    ...config,
+    text: 'Register',
+    onSuccess: () => onSuccess(),
+    onClose: () => onCloseFn(),
+  };
 
   const totalProductInCart = cartItems?.length;
   return (
@@ -45,13 +88,21 @@ export const Cart = ({ cartItems }: Props): JSX.Element => {
         </DrawerHeader>
 
         <DrawerBody gap={5} height={'100%'} pt={10}>
-          <Flex height={'100%'} width="100%" flexDirection={'column'} gap={6}>
+          <Flex
+            height={'100%'}
+            width="100%"
+            flexDirection={'column'}
+            gap={6}
+            overflowY={'auto'}
+          >
             <Flex width="100%" justifyContent={'center'}>
               {!cartItems && <Spinner size="xl" color="green" />}
             </Flex>
             {cartItems?.length > 0 &&
               cartItems?.map((product) => (
-                <CartItem product={product} key={product.cart?.id} />
+                <Suspense key={product?.cart?.id} fallback="Loading...">
+                  <CartItem product={product} key={product.cart?.id} />
+                </Suspense>
               ))}
 
             {!cartItems.length && (
@@ -66,16 +117,23 @@ export const Cart = ({ cartItems }: Props): JSX.Element => {
             alignItems={'center'}
             width="100%"
           >
-            <CustomText text={`Total`} textColor="black" fontWeight={'bold'} />
-            <Button
-              variant="outline"
-              mr={3}
-              onClick={onClose}
-              bg={colors.darkBlue}
-              color="white"
-            >
-              Checkout
-            </Button>
+            <CustomText
+              text={`Total: ₦${totalPrice || 0}`}
+              textColor="black"
+              fontWeight={'bold'}
+            />
+            <PaystackConsumer {...componentProps}>
+              {({ initializePayment }) => (
+                <button
+                  className="w-full bg-[#e9c365] text-white rounded-md "
+                  onClick={() => {
+                    initializePayment(onSuccess, onClose);
+                  }}
+                >
+                  Checkout
+                </button>
+              )}
+            </PaystackConsumer>
           </Flex>
         </DrawerFooter>
       </DrawerContent>

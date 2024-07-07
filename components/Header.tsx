@@ -100,7 +100,7 @@ export const Header = ({ id }: Props) => {
           <Links />
         </Flex>
         <OtherLinks id={id} />
-        <ToggleDarkMode />
+        {/* <ToggleDarkMode /> */}
         <MobileDrawer isOpen={isOpen} onClose={onClose} />
         <IconButton
           hideFrom="md"
