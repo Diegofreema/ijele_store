@@ -30,18 +30,35 @@ export const addToCart = async ({ productId, qty = 1 }: CartType) => {
     return { message: 'Please login' };
   }
   try {
-    const productAddedToCArt = await db
-      .insert(cartTable)
-      .values({
-        productId: productId,
-        userId: userId,
-        quantity: qty.toString(),
-      })
-      .returning();
-    if (productAddedToCArt.length > 0) {
-      revalidatePath('/', 'layout');
-      return { message: 'Cart updated' };
+    const isInCart = await db.query.cartTable.findFirst({
+      where: and(
+        eq(cartTable.userId, userId),
+        eq(cartTable.productId, productId)
+      ),
+    });
+
+    if (isInCart) {
+      await db
+        .update(cartTable)
+        .set({ quantity: sql`${cartTable.quantity} + 1` })
+        .where(eq(cartTable.id, isInCart.id));
     }
+
+    if (!isInCart) {
+      const productAddedToCArt = await db
+        .insert(cartTable)
+        .values({
+          productId: productId,
+          userId: userId,
+          quantity: qty.toString(),
+        })
+        .returning();
+      if (productAddedToCArt.length > 0) {
+        revalidatePath('/', 'layout');
+        return { message: 'Cart updated' };
+      }
+    }
+
     return { message: 'Error updating cart' };
   } catch (error) {
     console.log(error);
@@ -117,7 +134,7 @@ export const addToFav = async (productId: number) => {
 
 export const register = async (values: InsertUser) => {
   try {
-    const hashedPassword = await hashPasswordBcrypt(values.password);
+    const hashedPassword = await hashPasswordBcrypt(values.password!);
     if (!hashedPassword) return { message: 'Failed to create profile' };
     const userExists = await db
       .select()
@@ -157,7 +174,7 @@ export const login = async (email: string, password: string) => {
     if (!user) {
       return { message: 'User not found' };
     }
-    const hashPassword = await verifyPasswordBcrypt(user?.password, password);
+    const hashPassword = await verifyPasswordBcrypt(user?.password!, password);
 
     if (!hashPassword) {
       return { message: 'Invalid credentials' };
@@ -166,7 +183,7 @@ export const login = async (email: string, password: string) => {
     if (!user.verified) {
       return { message: 'not verified' };
     }
-    cookies().set('id', user.user_id);
+    cookies().set('id', user.user_id!);
     return { message: 'success' };
   } catch (error) {
     console.log('', error);
@@ -187,18 +204,6 @@ export const update = async (values: InsertUser, id: string) => {
 };
 export const getCookies = async () => {
   return cookies().get('id')?.value;
-};
-
-export const getProfile = async (id: string): Promise<SelectUser> => {
-  try {
-    const userData = await db
-      .select()
-      .from(usersTable)
-      .where(eq(usersTable.user_id, id));
-    return userData[0];
-  } catch (error) {
-    throw new Error('Failed to get profile');
-  }
 };
 
 export const forgotPasswordFn = async (email: string) => {
@@ -297,9 +302,12 @@ export const decreaseProductInCart = async (productId: number) => {
               eq(cartTable.productId, productId)
             )
           );
+        revalidatePath('/', 'layout');
+      } else {
+        await db.delete(cartTable).where(eq(cartTable.id, productInCart.id));
+        revalidatePath('/', 'layout');
       }
     }
-    revalidatePath('/', 'layout');
     return { message: 'success' };
   } catch (error) {
     return { message: 'failed' };

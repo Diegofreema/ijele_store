@@ -59,7 +59,7 @@ export const roleEnum = pgEnum('ROLE', [
   'coach',
 ]);
 export const productTable = pgTable('products', {
-  id: bigint('id', { mode: 'number' }).primaryKey(),
+  id: serial('id').primaryKey(),
   name: text('product_name').notNull(),
   description: text('description').notNull(),
   price: numeric('price').notNull(),
@@ -70,23 +70,22 @@ export const productTable = pgTable('products', {
 });
 
 export const usersTable = pgTable('users', {
-  id: bigint('id', { mode: 'number' }).primaryKey(),
+  id: serial('id').primaryKey(),
   firstName: text('first_name').notNull(),
   lastName: text('last_name').notNull(),
   middleName: text('middle_name'),
-  title: text('title'),
   salutation: text('salutation'),
   imageUrl: text('img_url'),
   email: text('email').notNull().unique(),
-  user_id: uuid('user_id').notNull().default('uuid_generate_v4()'),
+  user_id: uuid('user_id'),
   verified: boolean('verified').default(false),
   type: userEnum('type').default('regular'),
   dateOfBirth: text('dateOfBirth'),
-  gender: text('gender').notNull(),
+  gender: text('gender'),
   userId: text('userId'),
   duration: text('duration'),
   phoneNumber: text('phoneNumber'),
-  password: text('password').notNull(),
+  password: text('password'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -105,9 +104,23 @@ export const orders = pgTable('orders', {
     }),
   orderDate: timestamp('order_date').defaultNow().notNull(),
   status: statusEnum('status').default('pending'),
-  totalAmount: integer('total_amount').notNull().default(1),
+  totalAmount: numeric('total_amount').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  orderId: uuid('order_id').notNull(),
+});
+export const orderItems = pgTable('order_items', {
+  id: serial('id').primaryKey(),
+  createAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  quantity: numeric('quantity').notNull(),
+  productId: bigint('productId', { mode: 'number' }).references(
+    () => productTable.id,
+    {
+      onDelete: 'cascade',
+    }
+  ),
+  orderId: bigint('order_id', { mode: 'number' }).references(() => orders.id, {
+    onDelete: 'cascade',
+  }),
 });
 
 export const loanedIn = pgTable('loaned_in', {
@@ -255,6 +268,8 @@ export type SelectProduct = typeof productTable.$inferSelect;
 export type SelectCart = typeof cartTable.$inferSelect;
 export type InsertCart = typeof cartTable.$inferInsert;
 export type SelectFavorite = typeof favoriteTable.$inferSelect;
+
+export type SelectOrderItem = typeof orderItems.$inferSelect;
 
 export type SelectMen = typeof menTable.$inferSelect;
 export type SelectOrder = typeof orders.$inferSelect;

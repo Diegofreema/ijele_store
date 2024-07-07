@@ -16,6 +16,7 @@ import {
   Image,
   Flex,
   Spinner,
+  Heading,
 } from '@chakra-ui/react';
 import { CustomText } from '../typography';
 import { Minus, Plus } from 'lucide-react';
@@ -52,14 +53,30 @@ export const Cart = ({ cartItems }: Props): JSX.Element => {
               cartItems?.map((product) => (
                 <CartItem product={product} key={product.cart?.id} />
               ))}
+
+            {!cartItems.length && (
+              <Heading textAlign={'center'}>No item in cart</Heading>
+            )}
           </Flex>
         </DrawerBody>
 
-        <DrawerFooter>
-          <CustomText text={`Total`} />
-          <Button variant="outline" mr={3} onClick={onClose}>
-            Checkout
-          </Button>
+        <DrawerFooter width="100%">
+          <Flex
+            justifyContent={'space-between'}
+            alignItems={'center'}
+            width="100%"
+          >
+            <CustomText text={`Total`} textColor="black" fontWeight={'bold'} />
+            <Button
+              variant="outline"
+              mr={3}
+              onClick={onClose}
+              bg={colors.darkBlue}
+              color="white"
+            >
+              Checkout
+            </Button>
+          </Flex>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
@@ -136,6 +153,8 @@ const CartItem = ({ product }: { product: ProductInCartType }) => {
             onClick={handleDecrease}
             isDisabled={disabled}
             _hover={{ backgroundColor: '' }}
+            _pressed={{ bg: '', opacity: 1 }}
+            backgroundColor={'transparent'}
           />
           <Button
             bg="transparent"
@@ -144,6 +163,8 @@ const CartItem = ({ product }: { product: ProductInCartType }) => {
             onClick={handleIncrease}
             isDisabled={disabled}
             _hover={{ backgroundColor: '' }}
+            _pressed={{ bg: '', opacity: 1 }}
+            backgroundColor={'transparent'}
           />
         </Flex>
       </Box>

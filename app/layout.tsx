@@ -10,6 +10,7 @@ import { Modals } from '@/components/Modal';
 import { Providers } from '@/components/Providers';
 import { cookies } from 'next/headers';
 import { Drawer } from '@/components/drawers/Drawer';
+import { Profile } from '@/components/drawers/Profile';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -38,6 +39,7 @@ export default function RootLayout({
             <Header id={id} />
             <Modals />
             <Drawer />
+            <Profile />
             {children}
             <Footer />
           </Providers>

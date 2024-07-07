@@ -26,6 +26,7 @@ import {
   User,
   Heart,
   ShoppingCart,
+  ListOrdered,
 } from 'lucide-react';
 
 import { motion } from 'framer-motion';
@@ -169,18 +170,13 @@ export const ToggleDarkMode = () => {
 
 const OtherLinks = ({ id }: { id: string | undefined }) => {
   return (
-    <Flex
-      justifyContent={'space-between'}
-      alignItems={'center'}
-      hideBelow={'md'}
-      gap={10}
-    >
-      <InputGroup>
+    <Flex hideBelow={'md'}>
+      {/* <InputGroup>
         <InputLeftElement pointerEvents="none">
           <Search color="white" />
         </InputLeftElement>
         <Input placeholder="Search here..." />
-      </InputGroup>
+      </InputGroup> */}
 
       <IconGroup id={id} />
     </Flex>
@@ -226,14 +222,14 @@ const IconGroup = ({ id }: { id: string | undefined }) => {
         />
         <MyText text="Profile" mt={2} textColor="white" />
       </Box>
-      {/* <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
+      <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
         <IconButton
           aria-label="icon"
-          icon={<Heart />}
+          icon={<ListOrdered />}
           onClick={() => handleClick('fav')}
         />
-        <MyText text="Favorite" mt={2} textColor="white" />
-      </Box> */}
+        <MyText text="Orders" mt={2} textColor="white" />
+      </Box>
       <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
         <IconButton
           aria-label="icon"

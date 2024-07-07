@@ -1,4 +1,5 @@
 'use client';
+import { SelectOrder } from '@/db/schema';
 import { useFavOpen } from '@/lib/zustand/useFavOpen';
 import {
   Drawer,
@@ -9,10 +10,13 @@ import {
   DrawerContent,
   DrawerCloseButton,
   Button,
+  Flex,
 } from '@chakra-ui/react';
-type Props = {};
+type Props = {
+  orders: SelectOrder[];
+};
 
-export const Favorite = ({}: Props): JSX.Element => {
+export const Favorite = ({ orders }: Props): JSX.Element => {
   const { isOpen, onClose } = useFavOpen();
 
   return (
@@ -20,9 +24,9 @@ export const Favorite = ({}: Props): JSX.Element => {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>Favorite</DrawerHeader>
+        <DrawerHeader>Orders</DrawerHeader>
 
-        <DrawerBody></DrawerBody>
+        <DrawerBody display={'flex'} flexDir={'column'}></DrawerBody>
 
         <DrawerFooter>
           <Button variant="outline" mr={3} onClick={onClose}>
@@ -32,4 +36,8 @@ export const Favorite = ({}: Props): JSX.Element => {
       </DrawerContent>
     </Drawer>
   );
+};
+
+const OrderItem = ({ order }: { order: SelectOrder }) => {
+  return <Flex alignItems={'center'} justifyContent={'space-between'}></Flex>;
 };

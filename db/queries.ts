@@ -2,7 +2,16 @@
 
 import { and, count, eq, getTableColumns } from 'drizzle-orm';
 import { db } from '.';
-import { SelectCart, SelectProduct, cartTable, productTable } from './schema';
+import {
+  SelectCart,
+  SelectOrder,
+  SelectProduct,
+  SelectUser,
+  cartTable,
+  orders,
+  productTable,
+  usersTable,
+} from './schema';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ProductInCartType } from '@/hooks/useGetCart';
@@ -106,4 +115,30 @@ export const checkIfAddedInCart = async (
   });
   if (isInCart) return true;
   return false;
+};
+
+export const getProfile = async (id: string): Promise<SelectUser> => {
+  try {
+    const user = await db.query.usersTable.findFirst({
+      where: eq(usersTable.user_id, id),
+    });
+    if (!user) {
+      redirect('/');
+    }
+    return user;
+  } catch (error) {
+    throw new Error('Failed to get profile');
+  }
+};
+
+export const getOrders = async (id: string): Promise<Array<SelectOrder>> => {
+  try {
+    return await db.query.orders.findMany({
+      where: eq(orders.customerId, id),
+    });
+  } catch (error) {
+    console.log(error);
+
+    throw new Error('Failed to get orders');
+  }
 };

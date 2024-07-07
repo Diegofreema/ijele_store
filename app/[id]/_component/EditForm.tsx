@@ -1,18 +1,22 @@
 'use client';
 
+import { AuthHeader } from '@/components/AuthHeader';
+import { CustomButton } from '@/components/CustomButton';
+import { ValidateInput } from '@/components/ValidateInput';
+import { update } from '@/db/mutations';
+import { SelectUser } from '@/db/schema';
+import { updateSchema } from '@/validators';
+
 import { Box, Flex, SimpleGrid, useToast } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { registerSchema } from '@/validators';
-import { CustomButton } from '@/components/CustomButton';
-import { AuthHeader } from '@/components/AuthHeader';
+type Props = {
+  user: SelectUser | null;
+};
 
-import { register } from '@/db/mutations';
-import { ValidateInput } from '@/components/ValidateInput';
-type Props = {};
-
-export const RegisterForm = ({}: Props): JSX.Element => {
+export const EditForm = ({ user }: Props): JSX.Element => {
   const toast = useToast();
   const {
     control,
@@ -21,33 +25,42 @@ export const RegisterForm = ({}: Props): JSX.Element => {
     formState: { errors, isSubmitting },
     setValue,
     reset,
-  } = useForm<z.infer<typeof registerSchema>>({
+  } = useForm<z.infer<typeof updateSchema>>({
     defaultValues: {
       email: '',
-      password: '',
-      confirmPassword: '',
       firstName: '',
       lastName: '',
       phoneNumber: '',
     },
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(updateSchema),
   });
 
-  const onSubmit = async (data: z.infer<typeof registerSchema>) => {
-    try {
-      // @ts-ignore
-      const res = await register({
-        email: data.email,
-        password: data.password,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        phoneNumber: data.phoneNumber,
-      });
+  useEffect(() => {
+    if (user) {
+      setValue('email', user?.email);
+      setValue('firstName', user?.firstName);
+      setValue('lastName', user?.lastName);
+      setValue('phoneNumber', user?.phoneNumber || '');
+    }
+  }, [user, setValue]);
 
-      if (res?.message === 'Failed to create profile') {
+  const onSubmit = async (data: z.infer<typeof updateSchema>) => {
+    try {
+      const res = await update(
+        {
+          email: data.email,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          phoneNumber: data.phoneNumber,
+        },
+        user?.user_id!
+      );
+
+      if (res?.error === 'Failed to update') {
+        console.log(res?.error);
         toast({
           title: 'Error',
-          description: 'Failed to create profile',
+          description: 'Failed to update profile',
           status: 'error',
           isClosable: true,
           duration: 9000,
@@ -55,27 +68,14 @@ export const RegisterForm = ({}: Props): JSX.Element => {
         });
         return;
       }
-      if (res?.message === 'Profile already exists') {
-        toast({
-          title: 'User already exists',
-          description: 'Please use a different email',
-          status: 'error',
-          isClosable: true,
-          duration: 9000,
-          position: 'top-right',
-        });
-        return;
-      }
-
       toast({
-        title: 'Account has been created successfully',
-        description: 'Please check your email to verify your account',
+        title: 'Success',
+        description: 'Account has been updated successfully',
         status: 'success',
         isClosable: true,
         duration: 9000,
         position: 'top-right',
       });
-      reset();
     } catch (error) {
       console.log(error);
       toast({
@@ -90,18 +90,14 @@ export const RegisterForm = ({}: Props): JSX.Element => {
   };
 
   return (
-    <Flex mt={{ base: 150, md: 100 }} pb={50}>
+    <Flex mt={{ base: 50, md: 100 }} pb={50}>
       <Flex
         width={{ base: '90%', md: '70%', lg: '70%' }}
         mx="auto"
         justifyContent={'center'}
         flexDir={'column'}
       >
-        <AuthHeader
-          type="Sign up"
-          href="/sign-in"
-          text="Already have an account? Log in"
-        />
+        <AuthHeader type="Edit profile" href="" text="" />
 
         <SimpleGrid columns={{ base: 1, md: 2 }} gap={5}>
           <Box display={'flex'} flexDir={'column'} gap={5} mt={5}>
@@ -126,21 +122,6 @@ export const RegisterForm = ({}: Props): JSX.Element => {
               name={'lastName'}
               placeholder="Enter your last name"
             />
-
-            <ValidateInput
-              label="Password"
-              control={control}
-              errors={errors}
-              name={'password'}
-              placeholder="Enter a password"
-            />
-            <ValidateInput
-              label="Confirm password"
-              control={control}
-              errors={errors}
-              name={'confirmPassword'}
-              placeholder="Confirm your password"
-            />
           </Box>
           <Box display={'flex'} flexDir={'column'} gap={5} mt={5}>
             <ValidateInput
@@ -150,11 +131,22 @@ export const RegisterForm = ({}: Props): JSX.Element => {
               name={'phoneNumber'}
               placeholder="Enter your phone number"
             />
+
+            {/* <ValidateInput
+              label="Gender"
+              control={control}
+              errors={errors}
+              type="select"
+              data={['Male', 'Female']}
+              name={'gender'}
+              placeholder="Select a Gender"
+            /> */}
           </Box>
         </SimpleGrid>
         <Flex width={'100%'} justifyContent={'center'}>
           <CustomButton
-            title="Sign up"
+            title="Update"
+            loadingText="Updating..."
             onClick={handleSubmit(onSubmit)}
             isLoading={isSubmitting}
             mt={5}

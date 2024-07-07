@@ -134,14 +134,22 @@ CREATE TABLE IF NOT EXISTS "news" (
 	"title" text NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "order_items" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"quantity" numeric NOT NULL,
+	"productId" bigint,
+	"order_id" bigint
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "orders" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"customer_id" uuid NOT NULL,
 	"order_date" timestamp DEFAULT now() NOT NULL,
 	"status" "order_status" DEFAULT 'pending',
-	"total_amount" integer DEFAULT 1 NOT NULL,
+	"total_amount" numeric NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now(),
-	"updated_at" timestamp DEFAULT now() NOT NULL
+	"order_id" uuid NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "players_statistics" (
@@ -158,7 +166,7 @@ CREATE TABLE IF NOT EXISTS "players_statistics" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "products" (
-	"id" bigint PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"product_name" text NOT NULL,
 	"description" text NOT NULL,
 	"price" numeric NOT NULL,
@@ -169,23 +177,22 @@ CREATE TABLE IF NOT EXISTS "products" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
-	"id" bigint PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"first_name" text NOT NULL,
 	"last_name" text NOT NULL,
 	"middle_name" text,
-	"title" text,
 	"salutation" text,
 	"img_url" text,
 	"email" text NOT NULL,
-	"user_id" uuid DEFAULT 'uuid_generate_v4()' NOT NULL,
+	"user_id" uuid,
 	"verified" boolean DEFAULT false,
 	"type" "memberType" DEFAULT 'regular',
 	"dateOfBirth" text,
-	"gender" text NOT NULL,
+	"gender" text,
 	"userId" text,
 	"duration" text,
 	"phoneNumber" text,
-	"password" text NOT NULL,
+	"password" text,
 	"created_at" timestamp with time zone DEFAULT now(),
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
@@ -217,6 +224,18 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "favorite" ADD CONSTRAINT "favorite_productId_products_id_fk" FOREIGN KEY ("productId") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "order_items" ADD CONSTRAINT "order_items_productId_products_id_fk" FOREIGN KEY ("productId") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "order_items" ADD CONSTRAINT "order_items_order_id_orders_id_fk" FOREIGN KEY ("order_id") REFERENCES "public"."orders"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

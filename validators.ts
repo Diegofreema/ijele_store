@@ -44,7 +44,7 @@ export const registerSchema = z
     password: passwordSchema,
     firstName: z.string().min(1, { message: 'Please enter your first name' }),
     lastName: z.string().min(1, { message: 'Please enter your last name' }),
-    middleName: z.string().optional(),
+
     confirmPassword: z
       .string()
       .min(1, { message: 'Confirm Password is required' }),
@@ -54,13 +54,6 @@ export const registerSchema = z
     // country: z.string().min(1, { message: 'Please select a country' }),
     // state: z.string().min(1, { message: 'Please select a state of origin' }),
     // address: z.string().min(1, { message: 'Please enter your address' }),
-    dateOfBirth: z
-      .string()
-      .min(1, { message: 'Please enter your date of birth' }),
-    title: z.string().optional(),
-    salutation: z.string(),
-    gender: z.string().min(1, { message: 'Please select your gender' }),
-    img_url: z.string().min(1, { message: 'Please select an image' }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
@@ -75,17 +68,6 @@ export const updateSchema = z.object({
 
   firstName: z.string().min(1, { message: 'Please enter your first name' }),
   lastName: z.string().min(1, { message: 'Please enter your last name' }),
-  middleName: z.string().optional(),
 
   phoneNumber: z.string().min(1, { message: 'Please enter your phone number' }),
-  // country: z.string().min(1, { message: 'Please select a country' }),
-  // state: z.string().min(1, { message: 'Please select a state of origin' }),
-  // address: z.string().min(1, { message: 'Please enter your address' }),
-  dateOfBirth: z
-    .string()
-    .min(1, { message: 'Please enter your date of birth' }),
-  title: z.string().optional(),
-  salutation: z.string(),
-
-  img_url: z.string().min(1, { message: 'Please select an image' }),
 });

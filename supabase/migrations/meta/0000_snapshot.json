@@ -1,5 +1,5 @@
 {
-  "id": "19c06eea-7576-4e9e-a7bd-09b0ee24aefd",
+  "id": "a6b3cf80-1706-4313-b117-35fd8c4d7ecd",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -614,6 +614,74 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "public.order_items": {
+      "name": "order_items",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "productId": {
+          "name": "productId",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "order_id": {
+          "name": "order_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "order_items_productId_products_id_fk": {
+          "name": "order_items_productId_products_id_fk",
+          "tableFrom": "order_items",
+          "tableTo": "products",
+          "columnsFrom": [
+            "productId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "order_items_order_id_orders_id_fk": {
+          "name": "order_items_order_id_orders_id_fk",
+          "tableFrom": "order_items",
+          "tableTo": "orders",
+          "columnsFrom": [
+            "order_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "public.orders": {
       "name": "orders",
       "schema": "",
@@ -647,10 +715,9 @@
         },
         "total_amount": {
           "name": "total_amount",
-          "type": "integer",
+          "type": "numeric",
           "primaryKey": false,
-          "notNull": true,
-          "default": 1
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -659,12 +726,11 @@
           "notNull": false,
           "default": "now()"
         },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
+        "order_id": {
+          "name": "order_id",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         }
       },
       "indexes": {},
@@ -777,7 +843,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
@@ -836,7 +902,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
@@ -854,12 +920,6 @@
         },
         "middle_name": {
           "name": "middle_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "title": {
-          "name": "title",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -886,8 +946,7 @@
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'uuid_generate_v4()'"
+          "notNull": false
         },
         "verified": {
           "name": "verified",
@@ -914,7 +973,7 @@
           "name": "gender",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "userId": {
           "name": "userId",
@@ -938,7 +997,7 @@
           "name": "password",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",

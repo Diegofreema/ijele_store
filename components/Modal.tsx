@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ProfileDrawer } from './drawers/ProfileDrawer';
 import { Favorite } from './drawers/Favourite';
 
 type Props = {};
@@ -16,8 +15,6 @@ export const Modals = () => {
 
   return (
     <>
-      <ProfileDrawer />
-
       <Favorite />
     </>
   );
