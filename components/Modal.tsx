@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Favorite } from './drawers/Favourite';
 
 type Props = {};
 
@@ -13,9 +12,5 @@ export const Modals = () => {
 
   if (!mounted) return null;
 
-  return (
-    <>
-      <Favorite />
-    </>
-  );
+  return <></>;
 };
