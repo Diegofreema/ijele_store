@@ -11,6 +11,7 @@ import { Providers } from '@/components/Providers';
 import { cookies } from 'next/headers';
 import { Drawer } from '@/components/drawers/Drawer';
 import { Profile } from '@/components/drawers/Profile';
+import Orders from '@/components/drawers/Orders';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -40,6 +41,7 @@ export default function RootLayout({
             <Modals />
             <Drawer />
             <Profile />
+            <Orders />
             <div className="min-h-screen">{children}</div>
             <Footer />
           </Providers>

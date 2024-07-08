@@ -5,6 +5,8 @@ import {
   cartTable,
   favoriteTable,
   InsertUser,
+  orderItems,
+  orders,
   SelectUser,
   usersTable,
 } from './schema';
@@ -314,6 +316,58 @@ export const decreaseProductInCart = async (productId: number) => {
   }
 };
 
-export const resetPasswordFn = async (userId: string, password: string) => {
-  return { message: '' };
+export const resetPasswordFn = async (id: string, password: string) => {
+  try {
+    const hashedPassword = await hashPasswordBcrypt(password);
+    if (!hashedPassword) return { message: 'Failed to change password' };
+    await db
+      .update(usersTable)
+      .set({ password: hashedPassword })
+      .where(eq(usersTable.user_id, id));
+
+    return { message: 'Password changed successfully' };
+  } catch (error) {
+    console.log(error);
+
+    return { message: 'Failed to change password' };
+  }
+};
+
+export const createOrder = async (id: string, amount: number) => {
+  try {
+    const createdOrder = await db
+      .insert(orders)
+      .values({ customerId: id, totalAmount: amount.toString() })
+      .returning();
+    if (createdOrder) {
+      const cartItems = await db.query.cartTable.findMany({
+        where: eq(cartTable?.userId, id),
+      });
+      if (cartItems) {
+        const createOrderItem = async (item: {
+          productId: number | null;
+          id: number;
+          userId: string | null;
+          quantity: string | null;
+        }) => {
+          await db.insert(orderItems).values({
+            quantity: item.quantity!,
+            productId: item.productId,
+            orderId: createdOrder[0].id,
+          });
+        };
+        cartItems.forEach((item) => createOrderItem(item));
+        await db.delete(cartTable).where(eq(cartTable.userId, id));
+        revalidatePath('/', 'layout');
+        return { message: 'success' };
+      } else {
+        return { message: 'failed' };
+      }
+    } else {
+      return { message: 'failed' };
+    }
+  } catch (error) {
+    console.log('error', error);
+    return { message: 'failed' };
+  }
 };

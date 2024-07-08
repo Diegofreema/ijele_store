@@ -1,5 +1,5 @@
 {
-  "id": "a6b3cf80-1706-4313-b117-35fd8c4d7ecd",
+  "id": "f5d01069-d8dc-4763-bddf-6590b02cf941",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -586,7 +586,7 @@
         },
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
@@ -702,7 +702,7 @@
           "name": "order_date",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "default": "now()"
         },
         "status": {
@@ -730,7 +730,7 @@
           "name": "order_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         }
       },
       "indexes": {},
@@ -783,7 +783,7 @@
         },
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
@@ -1039,7 +1039,7 @@
         },
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },

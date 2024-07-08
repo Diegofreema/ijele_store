@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS "news" (
 	"author_name" text,
 	"category" text,
 	"created_at" timestamp with time zone DEFAULT now(),
-	"id" bigint PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"image_url" text,
 	"news" text NOT NULL,
 	"title" text NOT NULL
@@ -145,11 +145,11 @@ CREATE TABLE IF NOT EXISTS "order_items" (
 CREATE TABLE IF NOT EXISTS "orders" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"customer_id" uuid NOT NULL,
-	"order_date" timestamp DEFAULT now() NOT NULL,
+	"order_date" timestamp DEFAULT now(),
 	"status" "order_status" DEFAULT 'pending',
 	"total_amount" numeric NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now(),
-	"order_id" uuid NOT NULL
+	"order_id" uuid
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "players_statistics" (
@@ -157,7 +157,7 @@ CREATE TABLE IF NOT EXISTS "players_statistics" (
 	"assists" numeric,
 	"created_at" timestamp with time zone DEFAULT now(),
 	"goals" numeric,
-	"id" bigint PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"name" text,
 	"player_id" bigint NOT NULL,
 	"red_cards" numeric,
@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 CREATE TABLE IF NOT EXISTS "videos" (
 	"caption" text,
 	"created_at" timestamp with time zone DEFAULT now(),
-	"id" bigint PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"type" "VIDEO_TYPE"
 );
 --> statement-breakpoint

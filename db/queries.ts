@@ -5,9 +5,11 @@ import { db } from '.';
 import {
   SelectCart,
   SelectOrder,
+  SelectOrderItem,
   SelectProduct,
   SelectUser,
   cartTable,
+  orderItems,
   orders,
   productTable,
   usersTable,
@@ -134,12 +136,36 @@ export const getProfile = async (id: string): Promise<SelectUser | null> => {
 
 export const getOrders = async (id: string): Promise<Array<SelectOrder>> => {
   try {
-    return await db.query.orders.findMany({
+    const items = await db.query.orders.findMany({
       where: eq(orders.customerId, id),
     });
+    console.log(items);
+    return items;
   } catch (error) {
     console.log(error);
-
     throw new Error('Failed to get orders');
+  }
+};
+
+export const getOrderItems = async (
+  orderId?: number
+): Promise<Array<SelectOrderItem>> => {
+  try {
+    if (orderId) {
+      const items = await db.query.orderItems.findMany({
+        where: (table) => eq(table.orderId, orderId),
+        with: {
+          productId: true,
+        },
+      });
+      console.log('dgd', items);
+
+      return items;
+    }
+
+    return [];
+  } catch (error) {
+    console.log('gds', error);
+    return [];
   }
 };

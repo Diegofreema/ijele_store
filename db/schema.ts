@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import {
   integer,
   pgTable,
@@ -102,11 +103,11 @@ export const orders = pgTable('orders', {
     .references(() => usersTable.user_id, {
       onDelete: 'cascade',
     }),
-  orderDate: timestamp('order_date').defaultNow().notNull(),
+  orderDate: timestamp('order_date').defaultNow(),
   status: statusEnum('status').default('pending'),
   totalAmount: numeric('total_amount').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  orderId: uuid('order_id').notNull(),
+  orderId: uuid('order_id'),
 });
 export const orderItems = pgTable('order_items', {
   id: serial('id').primaryKey(),
@@ -202,7 +203,7 @@ export const news = pgTable('news', {
   authorName: text('author_name'),
   category: text('category'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  id: bigint('id', { mode: 'number' }).primaryKey(),
+  id: serial('id').primaryKey(),
   imageUrl: text('image_url'),
   news: text('news').notNull(),
   title: text('title').notNull(),
@@ -213,7 +214,7 @@ export const playerStats = pgTable('players_statistics', {
   assists: numeric('assists'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   goals: numeric('goals'),
-  id: bigint('id', { mode: 'number' }).primaryKey(),
+  id: serial('id').primaryKey(),
   name: text('name'),
   playerId: bigint('player_id', { mode: 'number' })
     .notNull()
@@ -226,7 +227,7 @@ export const playerStats = pgTable('players_statistics', {
 export const videoTable = pgTable('videos', {
   caption: text('caption'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  id: bigint('id', { mode: 'number' }).primaryKey(),
+  id: serial('id').primaryKey(),
   type: videoEnum('type'),
 });
 
@@ -251,6 +252,13 @@ export const favoriteTable = pgTable('favorite', {
     { onDelete: 'cascade' }
   ),
 });
+
+export const productRelation = relations(orderItems, ({ one }) => ({
+  productId: one(productTable, {
+    fields: [orderItems.productId],
+    references: [productTable.id],
+  }),
+}));
 
 // export const postsTable = pgTable('posts_table', {
 //   id: serial('id').primaryKey(),

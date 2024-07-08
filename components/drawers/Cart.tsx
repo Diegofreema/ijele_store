@@ -24,8 +24,9 @@ import { CustomText } from '../typography';
 import { Minus, Plus } from 'lucide-react';
 import { colors } from '@/constants';
 import { useDecrease, useIncrease } from '@/hooks/useControl';
-import { Suspense, useCallback, useReducer } from 'react';
+import { Suspense, useCallback, useReducer, useState } from 'react';
 import { SelectUser } from '@/db/schema';
+import { createOrder } from '@/db/mutations';
 type Props = {
   cartItems: ProductInCartType[];
   user: SelectUser | null;
@@ -33,6 +34,7 @@ type Props = {
 
 export const Cart = ({ cartItems, user }: Props): JSX.Element => {
   const { isOpen, onClose } = useCartOpen();
+  const [isSubmitting, setSubmitting] = useState(false);
   const toast = useToast();
   const totalPrice = cartItems.reduce((accumulator, item) => {
     return (
@@ -40,14 +42,38 @@ export const Cart = ({ cartItems, user }: Props): JSX.Element => {
     );
   }, 0);
   const onSuccess = useCallback(async () => {
-    toast({
-      title: 'Processing',
-      description: `Please be patient...`,
-      status: 'loading',
-      position: 'top-right',
-    });
-    // const { message } = await onSub(user.user_id, singleMember?.type as any);
-  }, [toast]);
+    setSubmitting(true);
+    try {
+      const { message } = await createOrder(user?.user_id!, totalPrice);
+      if (message === 'failed') {
+        toast({
+          title: 'Error',
+          description: 'Your order could not be placed',
+          status: 'error',
+          position: 'top-right',
+        });
+      }
+
+      if (message === 'success') {
+        toast({
+          title: 'Success',
+          description: 'Your order has been placed successfully',
+          status: 'success',
+          position: 'top-right',
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: 'Error',
+        description: 'Your order could not be placed',
+        status: 'error',
+        position: 'top-right',
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  }, [toast, totalPrice, user?.user_id]);
 
   const onCloseFn = useCallback(() => {
     toast({
@@ -124,14 +150,16 @@ export const Cart = ({ cartItems, user }: Props): JSX.Element => {
             />
             <PaystackConsumer {...componentProps}>
               {({ initializePayment }) => (
-                <button
-                  className="w-full bg-[#e9c365] text-white rounded-md "
+                <Button
                   onClick={() => {
                     initializePayment(onSuccess, onClose);
                   }}
+                  isDisabled={isSubmitting}
+                  isLoading={isSubmitting}
+                  loadingText="Processing..."
                 >
                   Checkout
-                </button>
+                </Button>
               )}
             </PaystackConsumer>
           </Flex>
