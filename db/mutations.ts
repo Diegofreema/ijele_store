@@ -210,11 +210,9 @@ export const getCookies = async () => {
 
 export const forgotPasswordFn = async (email: string) => {
   try {
-    const userData = await db
-      .select()
-      .from(usersTable)
-      .where(eq(usersTable.email, email));
-    const user = userData[0];
+    const user = await db.query.usersTable.findFirst({
+      where: (table, { eq }) => eq(table.email, email),
+    });
     if (user) {
       const { error: emailError } = await resend.emails.send({
         from: `Support <${process.env.SENDER_EMAIL}>`,
@@ -224,7 +222,8 @@ export const forgotPasswordFn = async (email: string) => {
           resetLink: `${api}/reset-password?id=${user.user_id}`,
         }),
       });
-      return { message: 'success' };
+      console.log('df', emailError);
+      if (!emailError) return { message: 'success' };
     }
 
     return { message: 'user not found' };
