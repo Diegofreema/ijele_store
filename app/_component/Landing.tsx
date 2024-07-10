@@ -7,7 +7,7 @@ type Props = {};
 export const Landing = ({}: Props): JSX.Element => {
   const bg = useColorModeValue(colors.darkBlue, '#181818');
   return (
-    <Box height={'100vh'} bg={bg} width="100%" mt={{ base: 150, md: 50 }}>
+    <Box height={'100vh'} bg={bg} width="100%" pt={{ base: 50, md: 50 }}>
       <Image
         alt="image"
         src="/bg.png"

@@ -72,13 +72,12 @@ const links = [
 export const Footer = ({}: Props) => {
   const color = useColorModeValue('white', colors.black);
   return (
-    <DarkContainer height={{ base: '100vh', md: '300px' }}>
+    <DarkContainer height={{ base: 'auto', md: '300px' }}>
       <SimpleGrid
         columns={{ base: 2, md: 4 }}
         gap={5}
         width={{ base: '80%', md: '90%' }}
         mx={'auto'}
-        pt={{ base: 20, md: 50 }}
       >
         {links.map((link) => (
           <Box display={'flex'} flexDir={'column'} gap={5} key={link.label}>
