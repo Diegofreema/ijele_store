@@ -36,7 +36,7 @@ export const Cart = ({ cartItems, user }: Props): JSX.Element => {
   const { isOpen, onClose } = useCartOpen();
   const [isSubmitting, setSubmitting] = useState(false);
   const toast = useToast();
-  const totalPrice = cartItems.reduce((accumulator, item) => {
+  const totalPrice = cartItems?.reduce((accumulator, item) => {
     return (
       accumulator + Number(item?.cart?.quantity) * Number(item?.products?.price)
     );
@@ -127,11 +127,11 @@ export const Cart = ({ cartItems, user }: Props): JSX.Element => {
             {cartItems?.length > 0 &&
               cartItems?.map((product) => (
                 <Suspense key={product?.cart?.id} fallback="Loading...">
-                  <CartItem product={product} key={product.cart?.id} />
+                  <CartItem product={product} key={product?.cart?.id} />
                 </Suspense>
               ))}
 
-            {!cartItems.length && (
+            {!cartItems?.length && (
               <Heading textAlign={'center'}>No item in cart</Heading>
             )}
           </Flex>

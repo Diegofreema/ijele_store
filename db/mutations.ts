@@ -186,6 +186,7 @@ export const login = async (email: string, password: string) => {
       return { message: 'not verified' };
     }
     cookies().set('id', user.user_id!);
+    revalidatePath('/', 'layout');
     return { message: 'success' };
   } catch (error) {
     console.log('', error);

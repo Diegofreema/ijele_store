@@ -5,7 +5,6 @@ import {
   CardBody,
   CardFooter,
   Flex,
-  IconButton,
   Image,
   SimpleGrid,
   Text,
@@ -16,10 +15,8 @@ import { Link } from 'next-view-transitions';
 import { formatText } from '@/lib/helper';
 import { CustomButton } from './CustomButton';
 
-import { Heart, ShoppingCart } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { useCart, useRemoveCart } from '@/hooks/useCart';
-import { useFav } from '@/hooks/useFav';
-import { colors } from '@/constants';
 import { useIsInCart } from '@/hooks/useGetCart';
 import { useRouter } from 'next/navigation';
 
@@ -62,7 +59,7 @@ export const ProductDisplay = ({ title, products }: Props): JSX.Element => {
           text="Coming soon"
           mt={15}
           textAlign={'center'}
-          fontSize={30}
+          fontSize={{ base: 20, md: 30 }}
           fontWeight={700}
         />
       )}

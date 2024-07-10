@@ -1,3 +1,4 @@
+'use client';
 import {
   Drawer,
   DrawerBody,
@@ -11,7 +12,7 @@ import {
   Button,
   useColorMode,
 } from '@chakra-ui/react';
-import { links } from './Header';
+import { IconGroup, links } from './Header';
 import { Link } from 'next-view-transitions';
 import { Moon, Sun } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -20,11 +21,12 @@ import { colors } from '@/constants';
 type Props = {
   isOpen: boolean;
   onClose: () => void;
+  id: string | undefined;
 };
 
-export function MobileDrawer({ isOpen, onClose }: Props) {
+export function MobileDrawer({ isOpen, onClose, id }: Props) {
   const color = useColorModeValue('black', '#fff');
-  const bg = useColorModeValue('#fff', '#181818');
+  const bg = useColorModeValue(colors.darkBlue, '#181818');
   const { colorMode, toggleColorMode } = useColorMode();
   const pathname = usePathname();
   return (
@@ -40,7 +42,7 @@ export function MobileDrawer({ isOpen, onClose }: Props) {
             justifyContent={'center'}
             height={'100%'}
           >
-            {links.map(({ href, label }) => {
+            {links?.map(({ href, label }) => {
               const isActive = pathname.includes(href);
               return (
                 <Link key={href} href={href} onClick={onClose}>
@@ -53,6 +55,7 @@ export function MobileDrawer({ isOpen, onClose }: Props) {
                 </Link>
               );
             })}
+            <IconGroup id={id} onClose={onClose} />
           </Flex>
         </DrawerBody>
 

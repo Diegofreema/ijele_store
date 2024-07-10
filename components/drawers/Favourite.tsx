@@ -96,7 +96,7 @@ export const Favorite = ({ orders }: Props): JSX.Element => {
                           : 'green';
                       return (
                         <Tr key={order.id}>
-                          <Td>{format(order.orderDate!, 'dd/mm/yy')}</Td>
+                          <Td>{format(order.orderDate!, 'dd/MM/yyyy')}</Td>
                           <Td textColor={textColor}>
                             {order?.status?.toLowerCase()}
                           </Td>

@@ -78,7 +78,7 @@ export const getSimilarProduct = async (
   } catch (error) {
     console.log(error);
 
-    throw new Error('Failed to get product');
+    return [];
   }
 };
 
@@ -97,7 +97,7 @@ export const getProductInCart = async (): Promise<Array<ProductInCartType>> => {
     return products;
   } catch (error) {
     console.log('error', error);
-    throw new Error('Failed to get product in cart');
+    return [];
   }
 };
 export const getId = () => {
@@ -143,7 +143,7 @@ export const getOrders = async (id: string): Promise<Array<SelectOrder>> => {
     return items;
   } catch (error) {
     console.log(error);
-    throw new Error('Failed to get orders');
+    return [];
   }
 };
 

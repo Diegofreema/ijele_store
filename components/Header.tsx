@@ -101,7 +101,7 @@ export const Header = ({ id }: Props) => {
         </Flex>
         <OtherLinks id={id} />
         {/* <ToggleDarkMode /> */}
-        <MobileDrawer isOpen={isOpen} onClose={onClose} />
+        <MobileDrawer isOpen={isOpen} onClose={onClose} id={id} />
         <IconButton
           hideFrom="md"
           onClick={onOpen}
@@ -183,7 +183,13 @@ const OtherLinks = ({ id }: { id: string | undefined }) => {
   );
 };
 
-const IconGroup = ({ id }: { id: string | undefined }) => {
+export const IconGroup = ({
+  id,
+  onClose,
+}: {
+  id: string | undefined;
+  onClose?: () => void;
+}) => {
   const { onOpen } = useCartOpen();
   const { onOpen: onOpenFav } = useFavOpen();
   const { onOpen: onOpenProfile } = useProfileOpen();
@@ -200,6 +206,7 @@ const IconGroup = ({ id }: { id: string | undefined }) => {
       });
       return;
     }
+    onClose && onClose();
     if (type === 'cart') {
       onOpen();
     }
@@ -213,7 +220,11 @@ const IconGroup = ({ id }: { id: string | undefined }) => {
     }
   };
   return (
-    <Flex alignItems={'center'} gap={5}>
+    <Flex
+      alignItems={'center'}
+      gap={5}
+      // flexDirection={{ base: 'column', md: 'row' }}
+    >
       <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
         <IconButton
           aria-label="icon"
