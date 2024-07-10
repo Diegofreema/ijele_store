@@ -19,6 +19,7 @@ import { ShoppingCart } from 'lucide-react';
 import { useCart, useRemoveCart } from '@/hooks/useCart';
 import { useIsInCart } from '@/hooks/useGetCart';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 
 type Props = {
   title: string;
@@ -48,10 +49,10 @@ export const ProductDisplay = ({ title, products }: Props): JSX.Element => {
           </Link>
         )}
       </Flex>
-      <SimpleGrid columns={{ base: 1, md: 3 }} gap={5}>
+      <SimpleGrid columns={{ base: 1, md: 3 }} gap={10}>
         {products?.length > 0 &&
-          products.map((product) => (
-            <ProductCard key={product.id} {...product} />
+          products.map((product, index) => (
+            <ProductCard key={product.id} index={index} {...product} />
           ))}
       </SimpleGrid>
       {!products.length && (
@@ -74,7 +75,8 @@ const ProductCard = ({
   name,
   price,
   description,
-}: SelectProduct) => {
+  index,
+}: SelectProduct & { index: number }) => {
   const { handleAddToCart, isLoading } = useCart(id);
   const { handleRemoveFromCart, isRemoving } = useRemoveCart(id);
   const { inCart, loading, fn } = useIsInCart(id);
@@ -92,7 +94,26 @@ const ProductCard = ({
     }
   };
   return (
-    <Card minHeight={400} overflow="hidden">
+    <Card
+      as={motion.div}
+      initial={{ y: 50, opacity: 0 }}
+      whileInView={{
+        y: 0,
+        opacity: 1,
+        transition: {
+          duration: 0.5,
+          type: 'spring',
+          damping: '8',
+          ease: 'easeInOut',
+          delay: 0.3 * index,
+        },
+      }}
+      whileHover={{ y: -20 }}
+      viewport={{ once: true }}
+      borderRadius={5}
+      minHeight={400}
+      overflow="hidden"
+    >
       <Link href={`/product?id=${id}`} passHref>
         <Image
           alt="image"

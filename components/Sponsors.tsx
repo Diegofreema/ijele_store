@@ -25,7 +25,7 @@ const partners = [
 export const Sponsor = ({}: Props) => {
   return (
     <LightContainer height={{ base: '300px' }}>
-      <Box width={{ base: '90%', md: '70%' }} mx={'auto'}>
+      <Box width={{ base: '90%', md: '70%' }} mx="auto">
         <MyText
           text="Partners"
           textColor={'white'}
@@ -34,10 +34,10 @@ export const Sponsor = ({}: Props) => {
         />
         <SimpleGrid
           gap={5}
-          mt={5}
+          pt={5}
           columns={{ base: 1, md: 4 }}
           maxWidth={{ base: '90%', md: '70%' }}
-          mx={'auto'}
+          mx="auto"
         >
           {partners.map((item, index) => (
             <Box
