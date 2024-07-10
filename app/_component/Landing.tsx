@@ -25,15 +25,15 @@ export const Landing = ({}: Props): JSX.Element => {
       position={'relative'}
       justifyContent={'center'}
     >
-      <Image
-        alt="img"
-        src="/hero.png"
-        position="absolute"
-        top={0}
-        left={0}
-        bottom={0}
-        right={0}
-      />
+      <Box position="absolute" top={0} left={0} bottom={0} right={0}>
+        <Image
+          alt="img"
+          src="/hero.png"
+          width={'100%'}
+          height={'100%'}
+          objectFit={'cover'}
+        />
+      </Box>
 
       <CaptionText />
     </Box>
@@ -55,10 +55,10 @@ const CaptionText = () => {
       alignItems={'center'}
       gap={3}
       zIndex={10}
-      mt={-40}
+      mt={{ base: 0, md: -40 }}
     >
       <Heading
-        fontSize={{ base: '3xl', md: '7xl' }}
+        fontSize={{ base: '5xl', md: '7xl' }}
         fontFamily={'var(--font-rubik)'}
         fontWeight={'bold'}
         textColor="white"
@@ -69,7 +69,7 @@ const CaptionText = () => {
       <Text
         textColor={'#eee'}
         width={{ base: '90%', md: '60%' }}
-        fontSize={{ base: 15, md: 20 }}
+        fontSize={{ base: 18, md: 20 }}
         textAlign={'center'}
       >
         Shop at Ijele SC store , where you will get quality sport wears at
