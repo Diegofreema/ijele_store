@@ -133,9 +133,11 @@ export const Details = ({ product, similarProduct }: Props): JSX.Element => {
                 _hover={{ backgroundColor: '' }}
               />
             </Flex>
-            <Text fontWeight={700} fontSize={15}>
-              {product?.numberInStock} items left in stock
-            </Text>
+            {product?.numberInStock?.length < 11 && (
+              <Text fontWeight={700} fontSize={15}>
+                {product?.numberInStock} items left in stock
+              </Text>
+            )}
           </Box>
           <Box position="absolute" bottom={0}>
             <CustomButton
