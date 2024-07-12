@@ -114,7 +114,9 @@ export const Details = ({ product, similarProduct }: Props): JSX.Element => {
               width={120}
               justifyContent={'center'}
               py={2}
+              px={3}
               mt="auto"
+              alignItems={'center'}
             >
               <Button
                 bg="transparent"
@@ -139,7 +141,11 @@ export const Details = ({ product, similarProduct }: Props): JSX.Element => {
               </Text>
             )}
           </Box>
-          <Box position="absolute" bottom={0}>
+          <Box
+            position={{ base: 'static', md: 'absolute' }}
+            mt={{ base: 5, md: 0 }}
+            bottom={0}
+          >
             <CustomButton
               leftIcon={<ShoppingCart color="black" />}
               isLoading={isLoading}
