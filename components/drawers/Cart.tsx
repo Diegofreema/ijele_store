@@ -27,6 +27,13 @@ import { useDecrease, useIncrease } from '@/hooks/useControl';
 import { Suspense, useCallback, useReducer, useState } from 'react';
 import { SelectUser } from '@/db/schema';
 import { createOrder } from '@/db/mutations';
+import {
+  CompleteResponesProps,
+  MonnifyProps,
+  PayWIthMonnifyPayment,
+  UserCancelledResponseProps,
+} from 'react-monnify-ts';
+import { useRouter } from 'next/navigation';
 type Props = {
   cartItems: ProductInCartType[];
   user: SelectUser | null;
@@ -36,66 +43,88 @@ export const Cart = ({ cartItems, user }: Props): JSX.Element => {
   const { isOpen, onClose } = useCartOpen();
   const [isSubmitting, setSubmitting] = useState(false);
   const toast = useToast();
+  const router = useRouter();
   const totalPrice = cartItems?.reduce((accumulator, item) => {
     return (
       accumulator + Number(item?.cart?.quantity) * Number(item?.products?.price)
     );
   }, 0);
-  const onSuccess = useCallback(async () => {
-    setSubmitting(true);
-    try {
-      const { message } = await createOrder(user?.user_id!, totalPrice);
-      if (message === 'failed') {
-        toast({
-          title: 'Error',
-          description: 'Your order could not be placed',
-          status: 'error',
-          position: 'top-right',
-        });
-      }
 
-      if (message === 'success') {
-        toast({
-          title: 'Success',
-          description: 'Your order has been placed successfully',
-          status: 'success',
-          position: 'top-right',
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      toast({
-        title: 'Error',
-        description: 'Your order could not be placed',
-        status: 'error',
-        position: 'top-right',
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  }, [toast, totalPrice, user?.user_id]);
-
-  const onCloseFn = useCallback(() => {
-    toast({
-      title: 'Oops!',
-      description: `You cancelled the transaction`,
-      status: 'info',
-      position: 'top-right',
-    });
-  }, [toast]);
-
-  const config = {
-    reference: new Date().getTime().toString(),
-    email: user?.email!,
-    amount: totalPrice! * 100,
-    publicKey: 'pk_test_52f4b5b31fa901229f5d3e2a1641d7477aacf092',
+  const config: MonnifyProps = {
+    amount: totalPrice,
+    currency: 'NGN',
+    reference: `${new String(new Date().getTime())}`,
+    customerName: user?.firstName + ' ' + user?.lastName,
+    customerEmail: user?.email!,
+    apiKey: 'MK_TEST_APTC98LF8Y',
+    contractCode: '7717054880',
+    paymentDescription: 'Checkout',
+    metadata: {
+      name: user?.firstName + ' ' + user?.lastName,
+    },
+    isTestMode: true,
+    customerPhoneNumber: user?.phoneNumber!,
   };
 
   const componentProps = {
-    ...config,
-    text: 'Register',
-    onSuccess: () => onSuccess(),
-    onClose: () => onCloseFn(),
+    options: config,
+    text: 'Checkout',
+    className: 'btn',
+    onLoadStart: () => {
+      console.log('loading has started');
+    },
+    onLoadComplete: () => {
+      console.log('SDK is UP');
+    },
+
+    onComplete: function (res: CompleteResponesProps) {
+      //Implement what happens when the transaction is completed.
+      setSubmitting(true);
+
+      createOrder(user?.user_id!, totalPrice)
+        .then(({ message }) => {
+          if (message === 'failed') {
+            toast({
+              title: 'Error',
+              description: 'Your order could not be placed',
+              status: 'error',
+              position: 'top-right',
+            });
+          }
+
+          if (message === 'success') {
+            toast({
+              title: 'Success',
+              description: 'Your order has been placed successfully',
+              status: 'success',
+              position: 'top-right',
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          toast({
+            title: 'Error',
+            description: 'Your order could not be placed',
+            status: 'error',
+            position: 'top-right',
+          });
+        })
+        .finally(() => {
+          setSubmitting(false);
+        });
+
+      console.log('response', res);
+    },
+    onClose: function (data: UserCancelledResponseProps) {
+      toast({
+        title: 'Oops!',
+        description: 'You canceled the transaction',
+        status: 'info',
+        position: 'top-right',
+      });
+      console.log('data', data);
+    },
   };
 
   const totalProductInCart = cartItems?.length;
@@ -148,12 +177,31 @@ export const Cart = ({ cartItems, user }: Props): JSX.Element => {
               textColor="black"
               fontWeight={'bold'}
             />
-            <PaystackConsumer {...componentProps}>
-              {({ initializePayment }) => (
+
+            <PayWIthMonnifyPayment {...componentProps}>
+              {({ initializePayment }: { initializePayment: any }) => (
                 <Button
                   onClick={() => {
-                    initializePayment(onSuccess, onClose);
+                    if (!user?.id) {
+                      router.push('/sign-in');
+                      toast({
+                        title: 'Sign in',
+                        description: 'Please in to continue',
+                        status: 'info',
+                        position: 'top-right',
+                        duration: 5000,
+                      });
+                      return;
+                    }
+                    initializePayment();
                   }}
+                  _hover={{
+                    bg: colors.lightBlue,
+                    transition: { duration: 0.3, ease: 'easeIn' },
+                  }}
+                  bg={colors.darkBlue}
+                  color={'white'}
+                  width={'100%'}
                   isDisabled={isSubmitting}
                   isLoading={isSubmitting}
                   loadingText="Processing..."
@@ -161,7 +209,7 @@ export const Cart = ({ cartItems, user }: Props): JSX.Element => {
                   Checkout
                 </Button>
               )}
-            </PaystackConsumer>
+            </PayWIthMonnifyPayment>
           </Flex>
         </DrawerFooter>
       </DrawerContent>

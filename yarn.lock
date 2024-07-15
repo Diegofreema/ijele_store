@@ -5644,6 +5644,11 @@ react-is@^16.13.1, react-is@^16.7.0:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-monnify-ts@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/react-monnify-ts/-/react-monnify-ts-0.0.4.tgz#7b1ce4d6c6128dbc75051b7dd207ac877c969b23"
+  integrity sha512-TaMI6Ty61QjdcD1k0oJT76qD89o9fjnmJSRydsO80GqMeogtJTybN/ZYN8slJ4+ua5xKGPo6/WYzueLagZR3UA==
+
 react-paystack@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/react-paystack/-/react-paystack-5.0.0.tgz#dbe47a7a55098154e7077b3aa917d4a1e19ce345"
