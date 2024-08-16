@@ -56,8 +56,8 @@ export const Cart = ({ cartItems, user }: Props): JSX.Element => {
     reference: `${new String(new Date().getTime())}`,
     customerName: user?.firstName + ' ' + user?.lastName,
     customerEmail: user?.email!,
-    apiKey: 'MK_TEST_APTC98LF8Y',
-    contractCode: '7717054880',
+    apiKey: process.env.NEXT_PUBLIC_MONNIFY!,
+    contractCode: process.env.NEXT_PUBLIC_CONTRACT!,
     paymentDescription: 'Checkout',
     metadata: {
       name: user?.firstName + ' ' + user?.lastName,
@@ -79,6 +79,7 @@ export const Cart = ({ cartItems, user }: Props): JSX.Element => {
 
     onComplete: function (res: CompleteResponesProps) {
       //Implement what happens when the transaction is completed.
+      if (res.status === 'FAILED') return;
       setSubmitting(true);
 
       createOrder(user?.user_id!, totalPrice)
@@ -271,7 +272,7 @@ const CartItem = ({ product }: { product: ProductInCartType }) => {
           />
         </Flex>
         <Flex
-          position={'absolute'}
+          position={{ base: 'static', md: 'absolute' }}
           bottom={0}
           bg={colors.darkBlue}
           borderRadius={50}
