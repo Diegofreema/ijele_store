@@ -2,14 +2,9 @@
 import {
   Box,
   Button,
-  color,
   Flex,
-  Icon,
   IconButton,
   Image,
-  Input,
-  InputGroup,
-  InputLeftElement,
   ResponsiveValue,
   Text,
   useColorMode,
@@ -22,9 +17,7 @@ import {
   Moon,
   Sun,
   MenuIcon,
-  Search,
   User,
-  Heart,
   ShoppingCart,
   ListOrdered,
 } from 'lucide-react';
@@ -37,14 +30,15 @@ import { MyText } from './MyText';
 import { useCartOpen } from '@/lib/zustand/useCartOpen';
 import { useFavOpen } from '@/lib/zustand/useFavOpen';
 import { useProfileOpen } from '@/lib/zustand/useProfileOpen';
-import { cookies } from 'next/headers';
-import { getId } from '@/db/queries';
-import { useEffect, useState } from 'react';
 
 interface Props {
   id: string | undefined;
 }
 export const links = [
+  {
+    href: 'https://www.ijelesportsclub.ng',
+    label: 'Ijele SC',
+  },
   {
     href: '/men',
     label: 'Men',
@@ -221,9 +215,9 @@ export const IconGroup = ({
   };
   return (
     <Flex
-      alignItems={'center'}
+      alignItems={{ base: 'flex-start', md: 'center' }}
       gap={5}
-      // flexDirection={{ base: 'column', md: 'row' }}
+      flexDirection={{ base: 'column', md: 'row' }}
     >
       <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
         <IconButton

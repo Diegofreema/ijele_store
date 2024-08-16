@@ -6,7 +6,6 @@ import {
   IconButton,
   SimpleGrid,
   Text,
-  useColorModePreference,
   useColorModeValue,
 } from '@chakra-ui/react';
 
@@ -74,7 +73,7 @@ export const Footer = ({}: Props) => {
   return (
     <DarkContainer height={{ base: 'auto', md: '300px' }}>
       <SimpleGrid
-        columns={{ base: 2, md: 4 }}
+        columns={{ base: 1, md: 4 }}
         gap={5}
         width={{ base: '80%', md: '90%' }}
         mx={'auto'}
@@ -145,7 +144,7 @@ const FooterLinks = () => {
     <Flex
       gap={5}
       width={{ base: '80%', md: '90%' }}
-      justifyContent={'flex-start'}
+      justifyContent={{ base: 'center', md: 'flex-start' }}
       mt={5}
     >
       {socialLinks.map(({ href, icon: CustomIcon }) => (
